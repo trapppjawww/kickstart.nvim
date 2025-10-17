@@ -702,6 +702,46 @@ require('lazy').setup({
             },
           },
         },
+
+        bashls = {},
+        css_variables = {},
+        cssls = {
+          init_options = {
+            provideFormatter = false,
+          },
+        },
+        html = {
+          init_options = {
+            provideFormatter = false,
+          },
+        },
+        jsonls = {
+          init_options = {
+            provideFormatter = false,
+          },
+        },
+        stylelint_lsp = {},
+        tailwindcss = {},
+        ts_ls = {},
+        vtsls = {
+          settings = {
+            vtsls = {
+              tsserver = {
+                globalPlugins = {
+                  {
+                    name = '@vue/typescript-plugin',
+                    location = vim.fn.stdpath 'data' .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
+                    languages = { 'vue' },
+                    configNamespace = 'typescript',
+                  },
+                },
+              },
+            },
+          },
+          filetypes = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue' },
+        },
+        vue_ls = {},
+        yamlls = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -723,19 +763,13 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      for server, config in pairs(servers) do
+        vim.lsp.config(server, config)
+      end
+
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
+        automatic_enable = true,
       }
     end,
   },
@@ -774,7 +808,7 @@ require('lazy').setup({
         lua = { 'stylua' },
         html = { 'prettierd' },
         css = { 'prettierd' },
-        sass = { 'prettierd' },
+        scss = { 'prettierd' },
         json = { 'prettierd' },
         javascript = { 'prettierd' },
         typescript = { 'prettierd' },
